@@ -1,0 +1,70 @@
+﻿@model UniversitiesDashBoardDemo.Models.DashBoardModel
+@using Highsoft.Web.Mvc.Charts
+<div class='col-xs-12'>
+    <div class="page-title">
+
+        <div class="pull-left">
+            <!-- PAGE HEADING TAG - START --><h1 class="title">Key performance Indicators</h1><!-- PAGE HEADING TAG - END -->
+        </div>
+
+        <div class="pull-right hidden-xs">
+            <ol class="breadcrumb">
+                <li>
+                    <a href="index.html"><i class="fa fa-home"></i>Home</a>
+                </li>
+                <li>
+                    <a href="blo-blogs.html">KPIs</a>
+                </li>
+                <li class="active">
+                    <strong>Summary</strong>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+</div>
+<div class="clearfix"></div>
+<!-- MAIN CONTENT AREA STARTS -->
+@*<a class="db_box_large fa fa-filter" style="float:right;margin-right:15px" data-toggle="modal" href="#section-settings"></a>*@
+
+@Html.Partial("_LineChart", Model)
+@Html.Partial("_CombinationChart", Model.combinationModel)
+@Html.Partial("_PieChart", Model)
+@Html.Partial("_PramidChart", Model)
+@*<div class="content-body">*@
+@Html.Partial("_Chat", null)
+@*</div>*@
+<div class="modal" id="section-settings" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog animated bounceInDown">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Data Filter</h4>
+
+            </div>
+            <div class="modal-body" style="height:200px">
+                @Html.Label("Search By University")
+                @Html.DropDownList("drpsearch", new SelectList(new List<SelectListItem>
+                       {
+                           new SelectListItem {  Text = "Test", Value = "-1"},
+                           new SelectListItem {  Text = "Homeowner", Value = "w"},
+                           new SelectListItem {  Text = "Contractor", Value = "w"},
+                       },"Value","Text"),new { @multiple = "multiple",@style="width:450px" })
+
+                <div class="modal-footer">
+                    <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+                    <span class="btn btn-info">
+                        @Ajax.ActionLink("Search","search",new AjaxOptions {
+                 HttpMethod="get",
+                 LoadingElementId="",
+                 UpdateTargetId="",
+                 OnSuccess="",
+                 OnFailure=""
+             })
+                    </span>
+                    @*<button class="btn btn-info" type="button">Search</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

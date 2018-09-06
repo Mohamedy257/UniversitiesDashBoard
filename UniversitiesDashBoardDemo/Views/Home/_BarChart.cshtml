@@ -1,0 +1,84 @@
+﻿@using Highsoft.Web.Mvc.Charts
+
+@model UniversitiesDashBoardDemo.Models.DashBoardModel
+<section class="box">
+    <header class="panel_header">
+        <h2 class="title pull-left">Universities Students</h2>
+        <div class="actions panel_actions pull-left">
+            <a class="box_toggle fa fa-chevron-down"></a>
+            <a class="box_setting fa fa-cog"></a>
+            <a class="db_box_large fa fa-filter" data-toggle="modal" href="#searchBarChart"></a>
+            <a class="box_close fa fa-times"></a>
+        </div>
+    </header>
+    @Html.HiddenFor(m => m.catogries)
+    <div class="content-body" id="cnt">
+    </div>
+</section>
+<div id="searchDiv">
+    @Html.Partial("_SearchPanel", null)
+</div>
+<script>
+    var href = $("#searchDiv #searchPanel").attr('href')
+    function initChart(data) {
+        Highcharts.chart('cnt', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Browser market shares. January, 2018'
+            },
+            subtitle: {
+                text: 'Click the columns to view versions. Source: <a href="http://statcounter.com" target="_blank">statcounter.com</a>'
+            },
+            xAxis: {
+                type: 'category'
+            },
+            yAxis: {
+                title: {
+                    text: 'Total percent market share'
+                }
+
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y:.1f}%'
+                    }
+                }
+            },
+
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+            },
+
+            "series": JSON.parse(data)
+        });
+    }
+    function onsuccess(result) {
+        var criteria = $("#drpsearch").val();
+        initChart(result, JSON.stringify(criteria));
+        $(".close").trigger("click");
+        $("#drpsearch").val(criteria);
+    }
+
+    $(document).ready(function () {
+        alert('@Html.Raw(Model.barChartDrill)');
+        initChart('@Html.Raw(Model.barChartDrill)');
+        $("#drpsearch").select2({
+            dropdownParent: $('#searchDiv')
+        });
+    });
+
+    $("#searchBtn").click(function () {
+        this.href = href;
+        var values = $("#drpsearch").val();
+        this.href = this.href.replace("value", values);
+    });
+</script>

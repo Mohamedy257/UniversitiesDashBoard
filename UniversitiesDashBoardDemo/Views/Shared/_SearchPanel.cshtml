@@ -1,0 +1,34 @@
+﻿<div class="modal" id="searchPanel" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog animated bounceInDown">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Data Filter</h4>
+
+            </div>
+            <div class="modal-body">
+                @Html.Label("Search By University")
+                @Html.DropDownList("drpsearch", new SelectList(new List<SelectListItem>
+                       {
+                           new SelectListItem {  Text = "ALBaha University", Value = "ALBaha University"},
+                           new SelectListItem {  Text = "DAMMAM University", Value = "DAMMAM University"},
+                           new SelectListItem {  Text = "Jazan University", Value = "Jazan University"},
+                           new SelectListItem {  Text = "King Abdulaziz University", Value = "King Abdulaziz University"},
+                       }, "Value", "Text"), new { @multiple = "multiple", @style = "width:450px" })
+            </div>
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+                <span class="btn btn-info">
+                    @Ajax.ActionLink("Search", "search", new { criteria = "value" }, new AjaxOptions {
+                   HttpMethod = "GET",
+                   LoadingElementId = "",
+                   UpdateTargetId = "cnt",
+                   OnSuccess = "onsuccess",
+                   OnFailure = ""
+               },new { @id="searchBtn"})
+                </span>
+                @*<button id="searchbtn" class="btn btn-info" type="button">Search</button>*@
+            </div>
+        </div>
+    </div>
+</div>

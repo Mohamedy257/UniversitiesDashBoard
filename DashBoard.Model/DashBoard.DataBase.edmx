@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="DashboardDemoModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'DashboardDemo.dbo.DC_UNIVERSITIES' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="DC_UNIVERSITIES">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Staff Type" Type="nvarchar" MaxLength="255" />
+          <Property Name="Nationality" Type="nvarchar" MaxLength="255" />
+          <Property Name="CNT" Type="float" />
+          <Property Name="Gender" Type="nvarchar" MaxLength="255" />
+          <Property Name="UniversityName" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'DashboardDemo.dbo.DM_DATAOBJECT' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="DM_DATAOBJECT">
+          <Property Name="CHART_ID" Type="int" />
+          <Property Name="CHART_NAME" Type="varchar" MaxLength="100" />
+          <Property Name="created_on" Type="date" />
+          <Property Name="created_by" Type="varchar" MaxLength="30" />
+          <Property Name="active_flg" Type="char" MaxLength="1" />
+          <Property Name="last_modified_date" Type="date" />
+          <Property Name="last_modified_by" Type="varchar" MaxLength="30" />
+          <Property Name="QUERY_STRING" Type="varchar" MaxLength="2000" />
+        </EntityType>-->
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'DashboardDemo.dbo.DM_SCREEN_CHART_POS' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="DM_SCREEN_CHART_POS">
+          <Property Name="screen_chart_id" Type="int" />
+          <Property Name="screen_id" Type="int" />
+          <Property Name="chart_id" Type="int" />
+          <Property Name="chart_position_row" Type="int" />
+          <Property Name="chart_pos_col" Type="int" />
+          <Property Name="dflt_type" Type="varchar" MaxLength="30" />
+          <Property Name="created_on" Type="date" />
+          <Property Name="created_by" Type="varchar" MaxLength="30" />
+          <Property Name="last_modified_date" Type="date" />
+          <Property Name="last_modified_by" Type="varchar" MaxLength="30" />
+        </EntityType>-->
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'DashboardDemo.dbo.DM_SCREENS' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="DM_SCREENS">
+          <Property Name="SCREEN_ID" Type="int" />
+          <Property Name="SCREEN_NAME" Type="varchar" MaxLength="100" />
+          <Property Name="created_on" Type="date" />
+          <Property Name="created_by" Type="varchar" MaxLength="30" />
+          <Property Name="active_flg" Type="char" MaxLength="1" />
+          <Property Name="last_modified_date" Type="date" />
+          <Property Name="last_modified_by" Type="varchar" MaxLength="30" />
+        </EntityType>-->
+        <EntityContainer Name="DashboardDemoModelStoreContainer">
+          <EntitySet Name="DC_UNIVERSITIES" EntityType="Self.DC_UNIVERSITIES" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [DC_UNIVERSITIES].[ID] AS [ID], 
+    [DC_UNIVERSITIES].[Staff Type] AS [Staff Type], 
+    [DC_UNIVERSITIES].[Nationality] AS [Nationality], 
+    [DC_UNIVERSITIES].[CNT] AS [CNT], 
+    [DC_UNIVERSITIES].[Gender] AS [Gender], 
+    [DC_UNIVERSITIES].[UniversityName] AS [UniversityName]
+    FROM [dbo].[DC_UNIVERSITIES] AS [DC_UNIVERSITIES]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DashboardDemoModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="DC_UNIVERSITIES">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Staff_Type" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Nationality" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CNT" Type="Double" />
+          <Property Name="Gender" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="UniversityName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityContainer Name="DashboarEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="DC_UNIVERSITIES" EntityType="Self.DC_UNIVERSITIES" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DashboardDemoModelStoreContainer" CdmEntityContainer="DashboarEntities">
+          <EntitySetMapping Name="DC_UNIVERSITIES">
+            <EntityTypeMapping TypeName="DashboardDemoModel.DC_UNIVERSITIES">
+              <MappingFragment StoreEntitySet="DC_UNIVERSITIES">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Staff_Type" ColumnName="Staff Type" />
+                <ScalarProperty Name="Nationality" ColumnName="Nationality" />
+                <ScalarProperty Name="CNT" ColumnName="CNT" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="UniversityName" ColumnName="UniversityName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

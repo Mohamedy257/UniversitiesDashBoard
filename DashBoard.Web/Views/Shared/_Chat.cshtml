@@ -1,0 +1,112 @@
+﻿<style>
+
+
+    .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        width: 400px;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    .darker {
+        border-color: #ccc;
+        background-color: #ddd;
+    }
+
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+        .container img.right {
+            float: right;
+            margin-left: 20px;
+            margin-right: 0;
+        }
+
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    .time-left {
+        float: left;
+        color: #999;
+    }
+</style>
+<div class="col-xs-12 col-md-6 col-lg-6">
+    <section class="box">
+        <header class="panel_header">
+            <h2 class="title pull-left">Universities Students</h2>
+            <div class="actions panel_actions pull-left">
+                <a class="box_toggle fa fa-chevron-down"></a>
+                <a id="changrChartButton" chartype="column" value="bar" class="box_setting fa fa-bar-chart"></a>
+                <a id="changrChartToAreaButton" chartype="area" class="box_setting fa fa-area-chart"></a>
+                <a class="box_setting fa fa-cog"></a>
+                <a class="db_box_large fa fa-filter" data-toggle="modal" href="#searchDiv #searchPanel"></a>
+                <a class="box_close fa fa-times"></a>
+            </div>
+        </header>
+        @*<h2>
+            <span class="fa fa-5x fa-chain"> Chat</span>
+        </h2>*@
+        <div class="content-body" id="chat">
+            <div id="chatPanel" style="width:50%">
+                <div class="container">
+                    <img src="https://www.w3schools.com/w3images/bandmember.jpg" alt="Avatar" style="width:100%;">
+                    <p>ابجد هوز حطلي كلمن وهي من المواضيع المؤثىه علي اتخاذ اي قرار سواء ايجابا او سلبا</p>
+                    <span class="time-right">11:00</span>
+                </div>
+
+                <div class="container darker">
+                    <img src="https://www.w3schools.com/w3images/avatar_g2.jpg" alt="Avatar" class="right" style="width:100%;">
+                    <p>ابجد هوز حطلي كلمن وهي من المواضيع المؤثىه علي اتخاذ اي قرار سواء ايجابا او سلبا</p>
+                    <span class="time-left">11:01</span>
+                </div>
+
+                <div class="container">
+                    <img src="https://www.w3schools.com/w3images/bandmember.jpg" alt="Avatar" style="width:100%;">
+                    <p>ابجد هوز حطلي كلمن وهي من المواضيع المؤثىه علي اتخاذ اي قرار سواء ايجابا او سلبا</p>
+                    <span class="time-right">11:02</span>
+                </div>
+
+                <div class="container darker">
+                    <img src="https://www.w3schools.com/w3images/avatar_g2.jpg" alt="Avatar" style="width:100%;">
+                    <p>ابجد هوز حطلي كلمن وهي من المواضيع المؤثىه علي اتخاذ اي قرار سواء ايجابا او سلبا</p>
+                    <span class="time-left">11:05</span>
+                </div>
+            </div>
+            <div class="container">
+                <div class="col-xs-9">
+                    <textarea rows="3" cols="35" id="txtarea"></textarea>
+                </div>
+                <div class="col-xs-1">
+                    <button class="btn btn-success" style="height:75px" id="btnSend"> <span class="fa fa-send"> Send</span></button>
+                </div>
+            </div>
+            </div>
+    </section>
+</div>
+
+<script>
+    $("#btnSend").click(function () {
+        $("#chatPanel").append(
+            '<div class="container darker">' +
+            '<img src = "https://www.w3schools.com/w3images/avatar_g2.jpg" alt = "Avatar" style = "width:100%;">' +
+            '<p>' + $("#txtarea").val() + '</p>' +
+            '<span class="time-left">11:05</span>' +
+            '</div >');
+
+    });
+</script>

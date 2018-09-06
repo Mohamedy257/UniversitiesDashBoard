@@ -1,0 +1,115 @@
+﻿@using Highsoft.Web.Mvc.Charts
+@model UniversitiesDashBoardDemo.Models.DashBoardModel
+<div class="col-xs-12 col-md-6 col-lg-6">
+    <section class="box">
+        <header class="panel_header">
+            <h2 class="title pull-left">Universities Students</h2>
+            <div class="actions panel_actions pull-left">
+                <a class="box_toggle fa fa-chevron-down"></a>
+                <a id="changrChartButton" chartype="column" value="bar" class="box_setting fa fa-bar-chart"></a>
+                <a id="changrChartToAreaButton" chartype="area" class="box_setting fa fa-area-chart"></a>
+                <a class="box_setting fa fa-cog"></a>
+                <a class="db_box_large fa fa-filter" data-toggle="modal" href="#searchDiv #searchPanel"></a>
+                <a class="box_close fa fa-times"></a>
+            </div>
+        </header>
+        @Html.HiddenFor(m => m.catogries)
+        <div class="content-body" id="cnt">
+        </div>
+    </section>
+
+    <div id="searchDiv">
+        @Html.Partial("_SearchPanel", null)
+    </div>
+    </div>
+
+    <script>
+    var href = $("#searchDiv #searchPanel #searchBtn").attr('href')
+    function initChart(data, catogriesData,type) {
+        Highcharts.chart('cnt', {
+            chart: {
+                type: type
+            },
+            title: {
+                text: 'Student Comparision'
+            },
+            subtitle: {
+                text: 'Describtion to be added'
+            },
+            xAxis: {
+                categories: JSON.parse(catogriesData),
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Student Count'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y} </b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+
+                    borderWidth: 0
+                }
+            },
+
+            series: JSON.parse(data)
+        });
+    }
+    function onsuccessChart(result) {
+        var criteria = $("#searchDiv #searchPanel #drpsearch").val();
+        initChart(result, JSON.stringify(criteria), $("#changrChartButton").attr('chartype'));
+        $(".close").trigger("click");
+        $("#searchDiv #searchPanel #drpsearch").val(criteria);
+    }
+
+    $(document).ready(function () {
+        initChart('@Html.Raw(Model.barChart)', '@Html.Raw(Model.catogries)','column');
+        $("#drpsearch").select2({
+            dropdownParent: $('#searchDiv #searchPanel')
+        });
+
+    });
+
+    $("#searchDiv #searchPanel #searchBtn").click(function () {
+        this.href = href;
+        var values = $("#searchDiv #searchPanel #drpsearch").val();
+        this.href = this.href.replace("value", values);
+
+    });
+
+    $('#searchDiv #searchPanel').on('shown.bs.modal', function (e) {
+        $("#searchDiv #searchPanel .modal-footer a").attr('data-ajax-success', 'onsuccessChart');
+    })
+
+    $("#changrChartButton").click(function () {
+        var type = $("#changrChartButton").attr('value');
+        if (type == 'column') {
+            $("#changrChartButton").attr('class', 'box_setting fa fa-bar-chart');
+            $("#changrChartButton").attr('value', 'bar');
+            $("#changrChartButton").attr('chartype', 'column');
+            $("#searchDiv #searchPanel #drpsearch").val('');
+            initChart('@Html.Raw(Model.barChart)', '@Html.Raw(Model.catogries)', 'column');
+        }
+        else {
+            $("#changrChartButton").attr('class', 'box_setting fa fa-line-chart');
+            $("#changrChartButton").attr('value', 'column');
+            $("#changrChartButton").attr('chartype', 'bar');
+            $("#searchDiv #searchPanel #drpsearch").val('');
+            initChart('@Html.Raw(Model.barChart)', '@Html.Raw(Model.catogries)', 'bar');
+        }
+    });
+
+    $("#changrChartToAreaButton").click(function () {
+            initChart('@Html.Raw(Model.barChart)', '@Html.Raw(Model.catogries)', 'area');
+    });
+    </script>
