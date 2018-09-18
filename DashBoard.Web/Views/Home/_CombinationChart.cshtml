@@ -1,376 +1,109 @@
 ﻿@using Highsoft.Web.Mvc.Charts
 @model UniversitiesDashBoardDemo.Models.DashBoardModel
-<div class="col-xs-12 col-md-6 col-lg-6">
+
+<div class="col-md-6" id="mainSection">
     <section class="box">
         <header class="panel_header">
-            <h2 class="title pull-left">Universites Chart</h2>
+            <h8 class="title pull-left">@ViewData["title"] </h8>
             <div class="actions panel_actions pull-left">
-                @Html.DropDownList("chartType", new SelectList(new List<SelectListItem>
-                         {
-                             new SelectListItem {  Text = "Pie", Value = "pie"},
-                             new SelectListItem {  Text = "Bar", Value = "bar"},
-                             new SelectListItem {  Text = "coulmn", Value = "column"},
-                             new SelectListItem {  Text = "bubble", Value = "bubble"}
-                         }, "Value", "Text"), new {  @style = "width:150px" })
-                <a class="box_toggle fa fa-chevron-down"></a>
-                <a class="box_setting fa fa-cog"></a>
-                @*<a class="db_box_large fa fa-filter" data-toggle="modal" href="#searchPieChart"></a>*@
-                <a class="box_close fa fa-times"></a>
+                @Ajax.ActionLink("Search", "PieChartSearchByUniversity", null , new AjaxOptions {
+               HttpMethod="get",
+               LoadingElementId="",
+               UpdateTargetId="",
+               OnSuccess= "onsuccessPieFilter",
+               OnComplete= "dimentionRequestCompleted(this)",
+               OnFailure=""
+           }, new { @onclick = "getPieSearchPrameters(this)", @id="search",type="none" ,@style="display:none"})
 
+                <a class="db_box_large fa fa-filter" data-toggle="modal" href="#searchDiv #searchPanel"></a>
+                <a class="box_toggle fa fa-chevron-down"></a>
+                <a class="box_close fa fa-times"></a>
             </div>
         </header>
-        @Html.HiddenFor(m => m.pieChart)
-        <div class="content-body" id="bucnt" style="display:block">
-            @using Highsoft.Web.Mvc.Charts
-
-            @(Html.Highsoft().GetHighcharts(
-                                new Highcharts
-                                {
-                                    Title = new Title
-                                    {
-                                        Text = ""
-                                    },
-                                    Subtitle = new Subtitle
-                                    {
-                                        Text = ""
-                                    },
-                                    XAxis = new List<XAxis>
-                                    {
-                    new XAxis
-                    {
-                        Type = XAxisType.Category
-                    }
-                                    },
-                                    YAxis = new List<YAxis>
-                                    {
-                    new YAxis
-                    {
-                        Title = new YAxisTitle
-                        {
-                            Text = "Total percent market share"
-                        }
-                    }
-                                    },
-                                    Legend = new Legend
-                                    {
-                                        Enabled = true
-                                    },
-                                    Tooltip = new Tooltip
-                                    {
-                                        HeaderFormat = "<span style='font-size:11px'>{series.name}</span><br>",
-                                        PointFormat = "<span style=\"color:{point.color}\">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>"
-                                    },
-
-                                    PlotOptions = new PlotOptions
-                                    {
-                                        Pie = new PlotOptionsPie
-                                        {
-                                            ShowInLegend = true,
-                                            AllowPointSelect = true,
-                                            Cursor = PlotOptionsPieCursor.Pointer,
-                                            DataLabels = new PlotOptionsPieDataLabels
-                                            {
-                                                Enabled = false,
-                                                Format = "{point.name}: {point.y:.1f}%",
-
-                                            },
-
-                                        }
-                                    },
-                                    Series = new List<Series>
-                                            {
-                    new PieSeries
-                    {
-                        Name = "Brands",
-                        Data = new List<PieSeriesData>
-                        {
-                            new PieSeriesData { Name = "Umm Al-Qura Uni.", Y = 56.3, Drilldown = "Umm Al-Qura Uni." },
-                            new PieSeriesData { Name = "King Khalid Uni.", Y = 24.03, Drilldown = "King Khalid Uni." },
-                            new PieSeriesData { Name = "king saud bin abdul aziz for helth Sciences", Y = 10.3, Drilldown = "king saud bin abdul aziz for helth Sciences" },
-                            new PieSeriesData { Name = "King Saud Uni.", Y = 4.77, Drilldown = "King Saud Uni." },
-                            new PieSeriesData { Name = "Majmaah  University", Y = 0.91, Drilldown = "Majmaah  University" },
-                            new PieSeriesData { Name = "Princ Satam Bin Abdulaziz  University", Y = 0.2, Drilldown = null }
-                        }
-                    }
-                                            },
-                                    Drilldown = new Drilldown
-                                    {
-                                        Series = new List<Series>
-                                                {
-                        new PieSeries
-                        {
-                            Name = "Umm Al-Qura Uni.",
-                            Id = "Umm Al-Qura Uni.",
-                            Data = new List<PieSeriesData>
-                            {
-                                new PieSeriesData { Name = "v11.0", Y = 24.13 },
-                                new PieSeriesData { Name = "v8.0", Y = 17.2 },
-                                new PieSeriesData { Name = "v9.0", Y = 8.11 },
-                                new PieSeriesData { Name = "v11.0", Y = 24.13 },
-                                new PieSeriesData { Name = "v10.0", Y = 5.33 },
-                                new PieSeriesData { Name = "v6", Y = 1.06 },
-                                new PieSeriesData { Name = "v7", Y = 0.5 }
-                            }
-                        },
-                        new PieSeries
-                        {
-                            Name = "King Khalid Uni.",
-                            Id = "King Khalid Uni.",
-                            Data = new List<PieSeriesData>
-                            {
-                                new PieSeriesData { Name = "v40.0", Y = 5 },
-                                new PieSeriesData { Name = "v41", Y = 4.32 },
-                                new PieSeriesData { Name = "v42", Y = 3.68 },
-                                new PieSeriesData { Name = "v39", Y = 2.96 },
-                                new PieSeriesData { Name = "v36", Y = 2.54 },
-                                new PieSeriesData { Name = "v43", Y = 1.45 },
-                                new PieSeriesData { Name = "v31", Y = 1.24 }
-                            }
-                        },
-                        new PieSeries
-                        {
-                            Name = "King Saud Uni.",
-                            Id = "King Saud Uni.",
-                            Data = new List<PieSeriesData>
-                            {
-                                new PieSeriesData { Name = "v35", Y = 7.32 },
-                                new PieSeriesData { Name = "v36", Y = 5.32 },
-                                new PieSeriesData { Name = "v37", Y = 4.68 },
-                                new PieSeriesData { Name = "v34", Y = 3.96 },
-                                new PieSeriesData { Name = "v38", Y = 2.54 },
-                                new PieSeriesData { Name = "v31", Y = 1.45 },
-                                new PieSeriesData { Name = "v32", Y = 1.24 }
-                            }
-                        },
-                        new PieSeries
-                        {
-                            Name = "king saud bin abdul aziz for helth Sciences",
-                            Id = "king saud bin abdul aziz for helth Sciences",
-                            Data = new List<PieSeriesData>
-                            {
-                                new PieSeriesData { Name = "v8", Y = 9.32 },
-                                new PieSeriesData { Name = "v7.1", Y = 7.12 },
-                                new PieSeriesData { Name = "v5.1", Y = 6.92 },
-                                new PieSeriesData { Name = "v5.0", Y = 6.71 },
-                                new PieSeriesData { Name = "v6.1", Y = 5.44 },
-                                new PieSeriesData { Name = "v7.0", Y = 4.32 },
-                                new PieSeriesData { Name = "v6.2", Y = 3.24 }
-                            }
-                        },
-                        new PieSeries
-                        {
-                            Name = "Majmaah  University",
-                            Id = "Majmaah  University",
-                            Data = new List<PieSeriesData>
-                            {
-                                new PieSeriesData { Name = "v12.x", Y = 5 },
-                                new PieSeriesData { Name = "v28", Y = 4.32 },
-                                new PieSeriesData { Name = "v27", Y = 2.15 },
-                                new PieSeriesData { Name = "v29", Y = 0.16 }
-                            }
-                        },
-                                                }
-                                    }
-                                }
-                                        , "chart8")
-            )
+        <div class="content-body" id="piecnt" piechartDimention=@ViewData["piechartDimention"]>
         </div>
-
-        <div class="content-body" id="bucnt2" style="display:none">
-            @using Highsoft.Web.Mvc.Charts
-
-            @(Html.Highsoft().GetHighcharts(
-                                new Highcharts
-                                {
-                                    Title = new Title
-                                    {
-                                        Text = "Universities Distrubition Pie/Bar Chart"
-                                    },
-                                    Subtitle = new Subtitle
-                                    {
-                                        Text = ""
-                                    },
-                                    XAxis = new List<XAxis>
-                                    {
-                    new XAxis
-                    {
-                        Type = XAxisType.Category
-                    }
-                                    },
-                                    YAxis = new List<YAxis>
-                                    {
-                    new YAxis
-                    {
-                        Title = new YAxisTitle
-                        {
-                            Text = "Total percent market share"
-                        }
-                    }
-                                    },
-                                    Legend = new Legend
-                                    {
-                                        Enabled = false
-                                    },
-                                    Tooltip = new Tooltip
-                                    {
-                                        HeaderFormat = "<span style='font-size:11px'>{series.name}</span><br>",
-                                        PointFormat = "<span style=\"color:{point.color}\">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>"
-                                    },
-
-                                    PlotOptions = new PlotOptions
-                                    {
-                                        Series = new PlotOptionsSeries
-                                        {
-                                            DataLabels = new PlotOptionsSeriesDataLabels
-                                            {
-                                                Enabled = true,
-                                                Format = "{point.y:.1f}%"
-                                            }
-                                        }
-                                    },
-                                    Series = new List<Series>
-                                    {
-                    new ColumnSeries
-                    {
-                        Name = "Brands",
-                        ColorByPoint = true,
-                        Data = new List<ColumnSeriesData>
-                        {
-                            new ColumnSeriesData { Name = "Umm Al-Qura Uni.", Y = 56.3, Drilldown = "Umm Al-Qura Uni." },
-                            new ColumnSeriesData { Name = "King Khalid Uni.", Y = 24.03, Drilldown = "King Khalid Uni." },
-                            new ColumnSeriesData { Name = "king saud bin abdul aziz for helth Sciences", Y = 10.3, Drilldown = "king saud bin abdul aziz for helth Sciences" },
-                            new ColumnSeriesData { Name = "King Saud Uni.", Y = 4.77, Drilldown = "King Saud Uni." },
-                            new ColumnSeriesData { Name = "Princ Satam Bin Abdulaziz  University", Y = 0.2, Drilldown = null }
-
-                        }
-                    }
-                                    },
-                                    Drilldown = new Drilldown
-                                    {
-                                        Series = new List<Series>
-                                        {
-                        new ColumnSeries
-                        {
-                            Name = "Microsoft Internet Explorer",
-                            Id = "Microsoft Internet Explorer",
-                            Data = new List<ColumnSeriesData>
-                            {
-                                new ColumnSeriesData { Name = "v11.0", Y = 24.13 },
-                                new ColumnSeriesData { Name = "v8.0", Y = 17.2 },
-                                new ColumnSeriesData { Name = "v9.0", Y = 8.11 },
-                                new ColumnSeriesData { Name = "v11.0", Y = 24.13 },
-                                new ColumnSeriesData { Name = "v10.0", Y = 5.33 },
-                                new ColumnSeriesData { Name = "v6", Y = 1.06 },
-                                new ColumnSeriesData { Name = "v7", Y = 0.5 }
-                            }
-                        },
-                        new ColumnSeries
-                        {
-                            Name = "Chrome",
-                            Id = "Chrome",
-                            Data = new List<ColumnSeriesData>
-                            {
-                                new ColumnSeriesData { Name = "v40.0", Y = 5 },
-                                new ColumnSeriesData { Name = "v41", Y = 4.32 },
-                                new ColumnSeriesData { Name = "v42", Y = 3.68 },
-                                new ColumnSeriesData { Name = "v39", Y = 2.96 },
-                                new ColumnSeriesData { Name = "v36", Y = 2.54 },
-                                new ColumnSeriesData { Name = "v43", Y = 1.45 },
-                                new ColumnSeriesData { Name = "v31", Y = 1.24 }
-                            }
-                        },
-                        new ColumnSeries
-                        {
-                            Name = "Firefox",
-                            Id = "Firefox",
-                            Data = new List<ColumnSeriesData>
-                            {
-                                new ColumnSeriesData { Name = "v35", Y = 7.32 },
-                                new ColumnSeriesData { Name = "v36", Y = 5.32 },
-                                new ColumnSeriesData { Name = "v37", Y = 4.68 },
-                                new ColumnSeriesData { Name = "v34", Y = 3.96 },
-                                new ColumnSeriesData { Name = "v38", Y = 2.54 },
-                                new ColumnSeriesData { Name = "v31", Y = 1.45 },
-                                new ColumnSeriesData { Name = "v32", Y = 1.24 }
-                            }
-                        },
-                        new ColumnSeries
-                        {
-                            Name = "Safari",
-                            Id = "Safari",
-                            Data = new List<ColumnSeriesData>
-                            {
-                                new ColumnSeriesData { Name = "v8", Y = 9.32 },
-                                new ColumnSeriesData { Name = "v7.1", Y = 7.12 },
-                                new ColumnSeriesData { Name = "v5.1", Y = 6.92 },
-                                new ColumnSeriesData { Name = "v5.0", Y = 6.71 },
-                                new ColumnSeriesData { Name = "v6.1", Y = 5.44 },
-                                new ColumnSeriesData { Name = "v7.0", Y = 4.32 },
-                                new ColumnSeriesData { Name = "v6.2", Y = 3.24 }
-                            }
-                        },
-                        new ColumnSeries
-                        {
-                            Name = "Opera",
-                            Id = "Opera",
-                            Data = new List<ColumnSeriesData>
-                            {
-                                new ColumnSeriesData { Name = "v12.x", Y = 5 },
-                                new ColumnSeriesData { Name = "v28", Y = 4.32 },
-                                new ColumnSeriesData { Name = "v27", Y = 2.15 },
-                                new ColumnSeriesData { Name = "v29", Y = 0.16 }
-                            }
-                        },
-                                        }
-                                    }
-                                }
-                                , "chart7")
-            )
-        </div>
-
     </section>
-
-  
-
+    <div id="searchDiv">
+        @Html.Partial("_SearchPanel", null)
     </div>
+</div>
 
-
-    <script>
-
-
-
-        function onsuccess(result) {
-            var criteria = $("#drpsearchPie").val();
-            initBuChart();
-            $(".close").trigger("click");
-            $("#drpsearchPie").val(criteria);
-        }
-
-        $(document).ready(function () {
-
-            //$("#drpsearchPie").select2({
-            //    dropdownParent: $('#searchPieChart')
-            //});
-            $("#chartType").select2();
+<script>
+    var counter = 1;
+    function initPieChart(chartId, data,colors) {
+        Highcharts.setOptions({
+            colors: JSON.parse(colors)
         });
-        $("#pieSearchBtn").click(function () {
-            //this.href = href;
-            var values = $("#drpsearchPie").val();
-            this.href = this.href.replace("value", values);
+        Highcharts.chart(chartId, {
+            chart: {
+                plotBackgroundColor: null,
+
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: ''
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: 'Brands',
+                colorByPoint: true,
+                data: JSON.parse(data)
+            }]
+        });
+    }
+    function onsuccessPieChart(result) {
+        $(this).attr('parentId');
+        initPieChart($(this).attr('parentId'),result, '@Html.Raw(ViewData["catogries"])', 'column');
+    }
+
+    $(document).ready(function () {
+        var newId = $("#piecnt").attr('Id', 'piechart' + counter);
+        counter += 1;
+        initPieChart($(newId).attr('Id'), '@Html.Raw(Model.pieChart)','@Html.Raw(ViewData["color"])');
+        $("#searchPanel #drpsearch").select2({
+            dropdownParent: $('#searchPanel')
         });
 
-        $("#chartType").change(function () {
 
-            var value = $("#chartType").val();
-            if (value == "bar") {
-                $("#bucnt2").css('display', '')
-                $("#bucnt").css('display', 'none')
-            }
-            else if (value == "pie") {
-                $("#bucnt2").css('display', 'none')
-                $("#bucnt").css('display', '')
-            }
-            else
-                alert('Other chart Type will be added Later')
-        });
-    </script>
+    });
+
+    function dimentionPieChange(value, object) {
+        var Id = $($($($(object).parentsUntil('#mainSection'))).find('div')[1]).attr('Id');
+        $(object).attr('href', $(object).attr('href') + '?dimention=' + value);
+        $(object).attr('parentId', Id);
+
+    }
+    function dimentionPieRequestCompleted(object) {
+        var urlArray = $(object).attr('href').split("?");
+        $(object).attr('href', urlArray[0]);
+    }
+
+    function onsuccessPieFilter(result) {
+        $(this).attr('parentId');
+        var chartDimention = $($($($(this).parentsUntil('#mainSection'))).find('div')[1]).attr('piechartDimention');
+        var arrayxAxis = $("#SearchCriteria").val().split(',');
+        var xAxis = JSON.stringify(arrayxAxis);
+        initPieChart($(this).attr('parentId'), result, getDimentionColor(chartDimention));
+    }
+
+    function getPieSearchPrameters(object) {
+        var chartDimention = $($($($(object).parentsUntil('#mainSection'))).find('div')[1]).attr('piechartDimention');
+        $(object).attr('href', $(object).attr('href') + '?searchCriteria=' + $("#SearchCriteria").val() + "&chartDimention=" + chartDimention);
+        var Id = $($($($(object).parentsUntil('#mainSection'))).find('div')[1]).attr('Id');
+        $(object).attr('parentId', Id);
+    }
+</script>

@@ -18,43 +18,6 @@ warning 6002: The table/view 'DashboardDemo.dbo.DC_UNIVERSITIES' does not have a
           <Property Name="Gender" Type="nvarchar" MaxLength="255" />
           <Property Name="UniversityName" Type="nvarchar" MaxLength="255" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'DashboardDemo.dbo.DM_DATAOBJECT' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
-        <EntityType Name="DM_DATAOBJECT">
-          <Property Name="CHART_ID" Type="int" />
-          <Property Name="CHART_NAME" Type="varchar" MaxLength="100" />
-          <Property Name="created_on" Type="date" />
-          <Property Name="created_by" Type="varchar" MaxLength="30" />
-          <Property Name="active_flg" Type="char" MaxLength="1" />
-          <Property Name="last_modified_date" Type="date" />
-          <Property Name="last_modified_by" Type="varchar" MaxLength="30" />
-          <Property Name="QUERY_STRING" Type="varchar" MaxLength="2000" />
-        </EntityType>-->
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'DashboardDemo.dbo.DM_SCREEN_CHART_POS' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
-        <EntityType Name="DM_SCREEN_CHART_POS">
-          <Property Name="screen_chart_id" Type="int" />
-          <Property Name="screen_id" Type="int" />
-          <Property Name="chart_id" Type="int" />
-          <Property Name="chart_position_row" Type="int" />
-          <Property Name="chart_pos_col" Type="int" />
-          <Property Name="dflt_type" Type="varchar" MaxLength="30" />
-          <Property Name="created_on" Type="date" />
-          <Property Name="created_by" Type="varchar" MaxLength="30" />
-          <Property Name="last_modified_date" Type="date" />
-          <Property Name="last_modified_by" Type="varchar" MaxLength="30" />
-        </EntityType>-->
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'DashboardDemo.dbo.DM_SCREENS' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
-        <EntityType Name="DM_SCREENS">
-          <Property Name="SCREEN_ID" Type="int" />
-          <Property Name="SCREEN_NAME" Type="varchar" MaxLength="100" />
-          <Property Name="created_on" Type="date" />
-          <Property Name="created_by" Type="varchar" MaxLength="30" />
-          <Property Name="active_flg" Type="char" MaxLength="1" />
-          <Property Name="last_modified_date" Type="date" />
-          <Property Name="last_modified_by" Type="varchar" MaxLength="30" />
-        </EntityType>-->
         <EntityContainer Name="DashboardDemoModelStoreContainer">
           <EntitySet Name="DC_UNIVERSITIES" EntityType="Self.DC_UNIVERSITIES" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 

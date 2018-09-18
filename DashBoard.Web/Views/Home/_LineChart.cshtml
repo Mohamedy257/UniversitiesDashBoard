@@ -1,42 +1,97 @@
 ﻿@using Highsoft.Web.Mvc.Charts
 @model UniversitiesDashBoardDemo.Models.DashBoardModel
-<div class="col-xs-12 col-md-6 col-lg-6">
+
+<div class="col-sm-6" id="mainSection">
     <section class="box">
         <header class="panel_header">
-            <h2 class="title pull-left">Universities Students</h2>
+            <h2 class="title pull-left">@ViewData["title"] </h2>
             <div class="actions panel_actions pull-left">
                 <a class="box_toggle fa fa-chevron-down"></a>
-                <a id="changrChartButton" chartype="column" value="bar" class="box_setting fa fa-bar-chart"></a>
-                <a id="changrChartToAreaButton" chartype="area" class="box_setting fa fa-area-chart"></a>
-                <a class="box_setting fa fa-cog"></a>
-                <a class="db_box_large fa fa-filter" data-toggle="modal" href="#searchDiv #searchPanel"></a>
+                <a class="box_setting fa fa-cog" id="menu1" data-toggle="dropdown"></a>
+                
+                @Ajax.ActionLink("Search", "DimentionSearchByUniversity",null , new AjaxOptions {
+               HttpMethod="get",
+               LoadingElementId="",
+               UpdateTargetId="",
+               OnSuccess= "onsuccessFilter",
+               OnComplete= "dimentionRequestCompleted(this)",
+               OnFailure=""
+           }, new { @onclick = "getSearchPrameters(this)" ,@id="search",type="none" ,@style="display:none"})
+                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                    <li role="presentation" value="Gender">
+                        @Ajax.ActionLink("Select By Gender", "ChangeDimention",null, new AjaxOptions {
+                       HttpMethod="get",
+                       LoadingElementId="",
+                       UpdateTargetId="",
+                       OnSuccess= "onsuccessChart",
+                       OnComplete= "dimentionRequestCompleted(this)",
+                       OnFailure=""
+                   }, new { @onclick = "dimentionChange('Gender', this)", @style = "color:black!important" ,@parentId="none" ,@type="1"})
+                    </li>
+                    <li role="presentation">
+                        @Ajax.ActionLink("Select By Nationality", "ChangeDimention",null, new AjaxOptions {
+                       HttpMethod="get",
+                       LoadingElementId="",
+                       UpdateTargetId="",
+                       OnSuccess= "onsuccessChart",
+                       OnComplete= "dimentionRequestCompleted(this)",
+                       OnFailure=""
+                   }, new {@onclick="dimentionChange('Nationality', this)", @style = "color:black!important", @type = "2", @parentId = "none" })
+                    </li>
+                    <li role="presentation">
+                        @Ajax.ActionLink("Select By Staff Type", "ChangeDimention",null, new AjaxOptions {
+                       HttpMethod="get",
+                       LoadingElementId="",
+                       UpdateTargetId="",
+                       OnSuccess= "onsuccessChart",
+                       OnComplete= "dimentionRequestCompleted(this)",
+                       OnFailure=""
+                   }, new { @onclick = "dimentionChange('Staff Type', this)" ,@style="color:black!important", @type = "3", @parentId = "none" })
+                    </li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation">
+                        @Ajax.ActionLink("Select By All", "ChangeDimention",null, new AjaxOptions {
+                       HttpMethod="get",
+                       LoadingElementId="",
+                       UpdateTargetId="",
+                       OnSuccess= "onsuccessChart",
+                       OnComplete= "dimentionRequestCompleted(this)",
+                       OnFailure=""
+                   },new  { @onclick = "dimentionChange('All', this)", @style = "color:black!important", @type = "4", @parentId = "none" })
+                    </li>
+                </ul>
                 <a class="box_close fa fa-times"></a>
             </div>
         </header>
-        @Html.HiddenFor(m => m.catogries)
-        <div class="content-body" id="cnt">
+        <div class="content-body" id="cnt" chartDimention=@ViewData["chartDimention"]>
         </div>
     </section>
+</div>
 
-    <div id="searchDiv">
-        @Html.Partial("_SearchPanel", null)
-    </div>
-    </div>
-
-    <script>
-    var href = $("#searchDiv #searchPanel #searchBtn").attr('href')
-    function initChart(data, catogriesData,type) {
-        Highcharts.chart('cnt', {
+<script>
+    var counter = 1;
+    function initChart(chartId, data, catogriesData, type, colors, length = 10) {
+        var chartcount = (JSON.parse(catogriesData)).length;
+        Highcharts.setOptions({
+            colors: JSON.parse(colors)
+        });
+        Highcharts.chart(chartId, {
             chart: {
-                type: type
+                type: type,
+                scrollablePlotArea: {
+                    minWidth: 700,
+                    scrollPositionX: 1
+                },
+                zoomType: 'x'
             },
             title: {
-                text: 'Student Comparision'
+                text: ''
             },
-            subtitle: {
-                text: 'Describtion to be added'
+            rangeSelector: {
+                selected: 1
             },
             xAxis: {
+                max: length - 1,
                 categories: JSON.parse(catogriesData),
                 crosshair: true
             },
@@ -64,52 +119,62 @@
 
             series: JSON.parse(data)
         });
+           
     }
     function onsuccessChart(result) {
-        var criteria = $("#searchDiv #searchPanel #drpsearch").val();
-        initChart(result, JSON.stringify(criteria), $("#changrChartButton").attr('chartype'));
-        $(".close").trigger("click");
-        $("#searchDiv #searchPanel #drpsearch").val(criteria);
+        $(this).attr('parentId');
+
+        initChart($(this).attr('parentId'), result, '@Html.Raw(ViewData["catogries"])', 'column', getDimentionColor("1"));
+    }
+
+    function onsuccessFilter(result) {
+        $(this).attr('parentId');
+        var chartDimention = $($($($(this).parentsUntil('#mainSection'))).find('div')[1]).attr('chartDimention');
+        var arrayxAxis = $("#SearchCriteria").val().split(',');
+        var xAxis = JSON.stringify(arrayxAxis);
+        initChart($(this).attr('parentId'), result, xAxis, 'column', getDimentionColor(chartDimention),arrayxAxis.length);
     }
 
     $(document).ready(function () {
-        initChart('@Html.Raw(Model.barChart)', '@Html.Raw(Model.catogries)','column');
-        $("#drpsearch").select2({
-            dropdownParent: $('#searchDiv #searchPanel')
-        });
-
+        var newId = $("#cnt").attr('Id', 'chart' + counter);
+        counter += 1;
+        initChart($(newId).attr('Id'), '@Html.Raw(Model.barChart)', '@Html.Raw(ViewData["catogries"])', 'column', '@Html.Raw(ViewData["color"])');
+      
     });
 
-    $("#searchDiv #searchPanel #searchBtn").click(function () {
-        this.href = href;
-        var values = $("#searchDiv #searchPanel #drpsearch").val();
-        this.href = this.href.replace("value", values);
+    function dimentionChange(value, object) {
+        var Id = $($($($(object).parentsUntil('#mainSection'))).find('div')[1]).attr('Id');
+        $(object).attr('href', $(object).attr('href') + '?dimention=' + value);
+        $(object).attr('parentId', Id);
 
-    });
+    }
 
-    $('#searchDiv #searchPanel').on('shown.bs.modal', function (e) {
-        $("#searchDiv #searchPanel .modal-footer a").attr('data-ajax-success', 'onsuccessChart');
-    })
+    function getSearchPrameters(object) {
+        debugger;
+        var chartDimention = $($($($(object).parentsUntil('#mainSection'))).find('div')[1]).attr('chartDimention');
+        $(object).attr('href', $(object).attr('href') + '?searchCriteria=' + $("#SearchCriteria").val() + "&chartDimention=" + chartDimention);
+        var Id = $($($($(object).parentsUntil('#mainSection'))).find('div')[1]).attr('Id');
+        $(object).attr('parentId', Id);
+    }
 
-    $("#changrChartButton").click(function () {
-        var type = $("#changrChartButton").attr('value');
-        if (type == 'column') {
-            $("#changrChartButton").attr('class', 'box_setting fa fa-bar-chart');
-            $("#changrChartButton").attr('value', 'bar');
-            $("#changrChartButton").attr('chartype', 'column');
-            $("#searchDiv #searchPanel #drpsearch").val('');
-            initChart('@Html.Raw(Model.barChart)', '@Html.Raw(Model.catogries)', 'column');
+    function dimentionRequestCompleted(object) {
+        debugger;
+        var urlArray = $(object).attr('href').split("?");
+        $(object).attr('href',  urlArray[0]);
+    }
+
+    function getDimentionColor(dimention) {
+        if (dimention == "1") {
+            return JSON.stringify(["#24CBE5", "#64E572"]);
         }
-        else {
-            $("#changrChartButton").attr('class', 'box_setting fa fa-line-chart');
-            $("#changrChartButton").attr('value', 'column');
-            $("#changrChartButton").attr('chartype', 'bar');
-            $("#searchDiv #searchPanel #drpsearch").val('');
-            initChart('@Html.Raw(Model.barChart)', '@Html.Raw(Model.catogries)', 'bar');
+        else if (dimention == "2") {
+            return JSON.stringify(["#FF9655", "#FFF263"]);
         }
-    });
-
-    $("#changrChartToAreaButton").click(function () {
-            initChart('@Html.Raw(Model.barChart)', '@Html.Raw(Model.catogries)', 'area');
-    });
-    </script>
+        else if (dimention == "3") {
+            return JSON.stringify(["#ED561B", "#DDDF00"]);
+        }
+        else if (dimention == "4") {
+            return JSON.stringify(["#24CBE5", "#64E572", "#FF9655", "#FFF263", "#ED561B", "#DDDF00"]);
+        }
+    }
+</script>

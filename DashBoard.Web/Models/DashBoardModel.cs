@@ -15,5 +15,6 @@ namespace UniversitiesDashBoardDemo.Models
         public string barChart { get; set; }
         public string barChartDrill { get; set; }
         public string catogries { get; set; }
+        public string SearchCriteria { get; set; }
     }
 }

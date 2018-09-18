@@ -5,147 +5,339 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using UniversitiesDashBoardDemo.Models;
+using DashBoard.BusinessLayer;
 
 namespace DashBoard.Web.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public ActionResult Index(string dimention)
         {
-            string ca = "";
+           
+            return View(new DashBoardModel());
+        }
+        public ActionResult GetChart(string dimention)
+        {
             DashBoardModel dashBoardModel = new DashBoardModel
             {
 
-                barChart = LineChartGeneration(out ca),
-                //barChartDrill = BarChartGenerator(),
-                catogries = ca,
-                pieChart = PieChartGenerator(),
-                barChartDrill = DrilDownGenerator(),
+                barChart = LineChartGeneration(dimention)
 
             };
-            return View(dashBoardModel);
+            return PartialView("_LineChart",dashBoardModel);
         }
 
-        public ActionResult search(string criteria)
+        public ActionResult GetPieChart(string dimention)
         {
-            string[] criteriaList = criteria.Split(',');
-            List<ChartsModel> model = null;
-            if (criteriaList.Length == 1)
+            DashBoardModel dashBoardModel = new DashBoardModel
             {
-                model = new List<ChartsModel> {
-                new ChartsModel { name="All Student",data = new List<int> { 123} },
-                new ChartsModel { name="Male Student",data = new List<int> { 123} },
-                new ChartsModel { name="Female Student",data = new List<int> { 123} },
-                new ChartsModel { name="Saudi Student",data = new List<int> { 123} },
-                new ChartsModel { name="non-Saudi Student",data = new List<int> { 123} }
+
+                pieChart = PieChartGenerator(dimention)
+
             };
+            return PartialView("_CombinationChart", dashBoardModel);
+        }
+        public ActionResult DimentionSearchByUniversity(string searchCriteria,string chartDimention)
+        {
+            var filters = searchCriteria.Split(',').ToList();
+            var data = UniversityService.Obj.GetAllUniversitiesData().Where(w=> filters.Contains(w.UniversityName));
+            
+            if (chartDimention == "1")
+            {
+                var Female = (data.Where(x => x.Gender == "Female").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Male = (data.Where(x => x.Gender == "Male").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<ChartsModel> model = new List<ChartsModel> {
+                new ChartsModel { name = "Female", data =  Female.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Male", data = Male.Select(a=> a.Sum(b=>b.CNT)).ToList() } };
+
+                ViewData["catogries"] = JsonConvert.SerializeObject(data.Select(s => s.UniversityName).Distinct().ToList());
+                ViewData["title"] = "Staff By Gender";
+                ViewData["color"] = JsonConvert.SerializeObject(new List<string>() { "#24CBE5", "#64E572" });
+                @ViewData["chartDimention"] = "1";
+                return Json(JsonConvert.SerializeObject(model),JsonRequestBehavior.AllowGet);
+            }
+            else if (chartDimention == "2")
+            {
+                var Saudi = (data.Where(x => x.Nationality == "Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var non_Saudi = (data.Where(x => x.Nationality == "Non Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<ChartsModel> model = new List<ChartsModel> {
+                new ChartsModel { name = "Saudi", data = Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Non Saudi", data = non_Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() }};
+                return Json(JsonConvert.SerializeObject(model),JsonRequestBehavior.AllowGet);
             }
 
-            else if (criteriaList.Length == 2)
+            else if (chartDimention == "3")
             {
-                model = new List<ChartsModel> {
-                new ChartsModel { name="All Student",data = new List<int> { 123,100} },
-                new ChartsModel { name="Male Student",data = new List<int> { 123,125} },
-                new ChartsModel { name="Female Student",data = new List<int> { 123,10} },
-                new ChartsModel { name="Saudi Student",data = new List<int> { 123,10} },
-                new ChartsModel { name="non-Saudi Student",data = new List<int> { 123,10} }
-            };
+                var teachingStaff = (data.Where(x => x.Staff_Type == "Teaching Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var adminAndTechStaff = (data.Where(x => x.Staff_Type == "Admin and Tech Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<ChartsModel> model = new List<ChartsModel> {
+                new ChartsModel { name = "Teaching Staff", data = teachingStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Admin and Tech Staff", data = adminAndTechStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() }};
+                return Json(JsonConvert.SerializeObject(model), JsonRequestBehavior.AllowGet);
             }
 
-            else if (criteriaList.Length == 3)
+            else
             {
-                model = new List<ChartsModel> {
-                new ChartsModel { name="All Student",data = new List<int> { 123,100, 100 } },
-                new ChartsModel { name="Male Student",data = new List<int> { 123,125,100} },
-                new ChartsModel { name="Female Student",data = new List<int> { 123,10,139} },
-                new ChartsModel { name="Saudi Student",data = new List<int> { 123,10,92} },
-                new ChartsModel { name="non-Saudi Student",data = new List<int> { 123,10,43} }
-            };
+                var Female = (data.Where(x => x.Gender == "Female").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Male = (data.Where(x => x.Gender == "Male").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Saudi = (data.Where(x => x.Nationality == "Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var non_Saudi = (data.Where(x => x.Nationality == "Non Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var teachingStaff = (data.Where(x => x.Staff_Type == "Teaching Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var adminAndTechStaff = (data.Where(x => x.Staff_Type == "Admin and Tech Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+
+                List<ChartsModel> model = new List<ChartsModel> {
+                    new ChartsModel { name = "Female", data = Female.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Male", data = Male.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                new ChartsModel { name = "Saudi", data = Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Non Saudi", data = non_Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                new ChartsModel { name = "Teaching Staff", data = teachingStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Admin and Tech Staff", data = adminAndTechStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() }};
+                return Json(JsonConvert.SerializeObject(model), JsonRequestBehavior.AllowGet);
             }
 
-            else if (criteriaList.Length == 4)
+        }
+        public string LineChartGeneration(string dimention)
+        {
+            var data = UniversityService.Obj.GetAllUniversitiesData();
+            if (dimention == "Gender")
             {
-                model = new List<ChartsModel> {
-                new ChartsModel { name="All Student",data = new List<int> { 123,100, 123, 100 } },
-                new ChartsModel { name="Male Student",data = new List<int> { 123,125, 123, 100 } },
-                new ChartsModel { name="Female Student",data = new List<int> { 123,10, 123, 100 } },
-                new ChartsModel { name="Saudi Student",data = new List<int> { 123,10, 123, 100 } },
-                new ChartsModel { name="non-Saudi Student",data = new List<int> { 123,10, 123, 100 } }
-            };
+                var Female = (data.Where(x => x.Gender == "Female").Select(s => new { s.UniversityName, s.CNT}).GroupBy(g=>g.UniversityName)).ToList();
+                var Male = (data.Where(x => x.Gender == "Male").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<ChartsModel> model = new List<ChartsModel> {
+                new ChartsModel { name = "Female", data =  Female.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Male", data = Male.Select(a=> a.Sum(b=>b.CNT)).ToList() } };
+
+                ViewData["catogries"] = JsonConvert.SerializeObject(data.Select(s => s.UniversityName).Distinct().ToList());
+                ViewData["title"] = "Staff By Gender";
+                ViewData["color"] = JsonConvert.SerializeObject(new List<string>() { "#24CBE5", "#64E572" });
+                @ViewData["chartDimention"] = "1";
+                return JsonConvert.SerializeObject(model);
             }
-            return Json(JsonConvert.SerializeObject(model), JsonRequestBehavior.AllowGet);
-        }
-
-        public string LineChartGeneration(out string catogries)
-        {
-            List<ChartsModel> model = new List<ChartsModel> {
-                new ChartsModel { name="All Student",data = new List<int> { 1223,1100,170,1003, 1723, 190, 1239, 1000 } },
-                new ChartsModel { name="Male Student",data = new List<int> { 933,2125,305,1263, 1233, 1688, 4325, 180 } },
-                new ChartsModel { name="Female Student",data = new List<int> {823,310,1332,1004, 123, 2090, 2356, 180 } },
-                new ChartsModel { name="Saudi Student",data = new List<int> { 7123,410,1442,5003, 123, 870, 9864, 180 } },
-                new ChartsModel { name="non-Saudi Student",data = new List<int> { 123,910,1542,2600, 123, 8100, 980, 150 } }
-
-            };
-            catogries = JsonConvert.SerializeObject(new List<string> { "ALBaha University", "DAMMAM University", "Jazan University", "King Abdulaziz University", "ALBaha University", "DAMMAM University", "Jazan University", "King Abdulaziz University" });
-            return JsonConvert.SerializeObject(model);
-        }
-        public string PieChartGenerator()
-        {
-            List<BarChartDataModel> barChartDataModel = new List<BarChartDataModel>()
+            else if (dimention == "Nationality")
             {
-                new BarChartDataModel { name="ALBaha University",y=23,drilldown="ALBaha University"},
-                new BarChartDataModel { name="DAMMAM University",y=123,drilldown="DAMMAM University"},
-                new BarChartDataModel { name="Jazan University",y=223,drilldown="Jazan University"},
-                new BarChartDataModel { name="King Abdulaziz University",y=63,drilldown="King Abdulaziz University"},
-            };
-            string result = JsonConvert.SerializeObject(barChartDataModel);
-            return result;
+                var Saudi = (data.Where(x => x.Nationality == "Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var non_Saudi = (data.Where(x => x.Nationality == "Non Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<ChartsModel> model = new List<ChartsModel> {
+                new ChartsModel { name = "Saudi", data = Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Non Saudi", data = non_Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() }};
+                ViewData["catogries"] = JsonConvert.SerializeObject(data.Select(s => s.UniversityName).Distinct().ToList());
+                ViewData["title"] = "Staff By Nationality";
+                ViewData["color"] = JsonConvert.SerializeObject(new List<string>() { "#FF9655", "#FFF263" });
+                @ViewData["chartDimention"] = "2";
+                return JsonConvert.SerializeObject(model);
+            }
+            else if (dimention == "Staff Type")
+            {
+                var teachingStaff = (data.Where(x => x.Staff_Type == "Teaching Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var adminAndTechStaff = (data.Where(x => x.Staff_Type == "Admin and Tech Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<ChartsModel> model = new List<ChartsModel> {
+                new ChartsModel { name = "Teaching Staff", data = teachingStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Admin and Tech Staff", data = adminAndTechStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() }};
+                ViewData["title"] = "Staff By Staff Type";
+                ViewData["catogries"] = JsonConvert.SerializeObject(data.Select(s => s.UniversityName).Distinct().ToList());
+                ViewData["color"] = JsonConvert.SerializeObject(new List<string>() { "#ED561B", "#DDDF00" });
+                @ViewData["chartDimention"] = "3";
+                return JsonConvert.SerializeObject(model);
+            }
+            else
+            {
+                var Female = (data.Where(x => x.Gender == "Female").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Male = (data.Where(x => x.Gender == "Male").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Saudi = (data.Where(x => x.Nationality == "Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var non_Saudi = (data.Where(x => x.Nationality == "Non Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var teachingStaff = (data.Where(x => x.Staff_Type == "Teaching Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var adminAndTechStaff = (data.Where(x => x.Staff_Type == "Admin and Tech Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+
+                List<ChartsModel> model = new List<ChartsModel> {
+                    new ChartsModel { name = "Female", data = Female.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Male", data = Male.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                new ChartsModel { name = "Saudi", data = Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Non Saudi", data = non_Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                new ChartsModel { name = "Teaching Staff", data = teachingStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Admin and Tech Staff", data = adminAndTechStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() }};
+                ViewData["catogries"] = JsonConvert.SerializeObject(data.Select(s => s.UniversityName).Distinct().ToList());
+                ViewData["title"] = "Staff By Type";
+                ViewData["color"] = JsonConvert.SerializeObject(new List<string>() { "#24CBE5", "#64E572", "#FF9655", "#FFF263", "#ED561B", "#DDDF00" });
+                @ViewData["chartDimention"] = "4";
+                return JsonConvert.SerializeObject(model);
+            }
         }
-        public string BarChartGenerator()
+
+        public ActionResult ChangeDimention(string dimention)
         {
-            List<BarChartDataModel> barChartDataModel = new List<BarChartDataModel>()
+            var data = UniversityService.Obj.GetAllUniversitiesData();
+            if (dimention == "Gender")
             {
-                new BarChartDataModel { name="ALBaha University",y=23,drilldown="ALBaha University"},
-                new BarChartDataModel { name="DAMMAM University",y=123,drilldown="DAMMAM University"},
-                new BarChartDataModel { name="Jazan University",y=223,drilldown="Jazan University"},
-                new BarChartDataModel { name="King Abdulaziz University",y=63,drilldown="King Abdulaziz University"},
-            };
-
-            List<BarChartDrillDownModel> barChartDrillDownModel = new List<BarChartDrillDownModel>()
+                var Female = (data.Where(x => x.Gender == "Female").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Male = (data.Where(x => x.Gender == "Male").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<ChartsModel> model = new List<ChartsModel> {
+                new ChartsModel { name = "Female", data =  Female.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Male", data = Male.Select(a=> a.Sum(b=>b.CNT)).ToList() } };
+                return Json(JsonConvert.SerializeObject(model), JsonRequestBehavior.AllowGet);
+            }
+            else if (dimention == "Nationality")
             {
-                new BarChartDrillDownModel{name="ALBaha University",id="ALBaha University",data=new List<Tuple<string, double>>(){ new Tuple<string, double>("Male",100), new Tuple<string, double>("Female", 100) , new Tuple<string, double>("Saudi", 100) } },
-                new BarChartDrillDownModel{name="ALBaha University",id="ALBaha University",data=new List<Tuple<string, double>>(){ new Tuple<string, double>("Male",100), new Tuple<string, double>("Female", 100) , new Tuple<string, double>("Saudi", 100) } },
-                new BarChartDrillDownModel{name="ALBaha University",id="ALBaha University",data=new List<Tuple<string, double>>(){ new Tuple<string, double>("Male",100), new Tuple<string, double>("Female", 100) , new Tuple<string, double>("Saudi", 100) } },
-                new BarChartDrillDownModel{name="ALBaha University",id="ALBaha University",data=new List<Tuple<string, double>>(){ new Tuple<string, double>("Male",100), new Tuple<string, double>("Female", 100) , new Tuple<string, double>("Saudi", 100) } },
-            };
-            var serializer = new JsonSerializer();
-            string result = JsonConvert.SerializeObject(barChartDataModel) + ",'drilldown': {" + JsonConvert.SerializeObject(barChartDrillDownModel) + "}";
+                var Saudi = (data.Where(x => x.Nationality == "Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var non_Saudi = (data.Where(x => x.Nationality == "Non Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<ChartsModel> model = new List<ChartsModel> {
+                new ChartsModel { name = "Saudi", data = Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Non Saudi", data = non_Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() }};
+                return Json(JsonConvert.SerializeObject(model), JsonRequestBehavior.AllowGet);
+            }
+            else if (dimention == "Staff Type")
+            {
+                var teachingStaff = (data.Where(x => x.Staff_Type == "Teaching Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var adminAndTechStaff = (data.Where(x => x.Staff_Type == "Admin and Tech Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<ChartsModel> model = new List<ChartsModel> {
+                new ChartsModel { name = "Teaching Staff", data = teachingStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Admin and Tech Staff", data = adminAndTechStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() }};
+                return Json(JsonConvert.SerializeObject(model), JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                var Female = (data.Where(x => x.Gender == "Female").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Male = (data.Where(x => x.Gender == "Male").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Saudi = (data.Where(x => x.Nationality == "Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var non_Saudi = (data.Where(x => x.Nationality == "Non Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var teachingStaff = (data.Where(x => x.Staff_Type == "Teaching Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var adminAndTechStaff = (data.Where(x => x.Staff_Type == "Admin and Tech Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
 
-            return result;
+                List<ChartsModel> model = new List<ChartsModel> {
+                    new ChartsModel { name = "Female", data = Female.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Male", data = Male.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                new ChartsModel { name = "Saudi", data = Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Non Saudi", data = non_Saudi.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                new ChartsModel { name = "Teaching Staff", data = teachingStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() },
+                 new ChartsModel { name = "Admin and Tech Staff", data = adminAndTechStaff.Select(a=> a.Sum(b=>b.CNT)).ToList() }};
+                return Json(JsonConvert.SerializeObject(model), JsonRequestBehavior.AllowGet);
+            }
+
         }
 
-        public string DrilDownGenerator()
+        public string PieChartGenerator(string dimention)
         {
-            //List<BarChartDataModel> barChartDataModel = new List<BarChartDataModel>()
-            //{
-            //    new BarChartDataModel { name="ALBaha University",y=23,drilldown="ALBaha University"},
-            //    new BarChartDataModel { name="DAMMAM University",y=123,drilldown="DAMMAM University"},
-            //    new BarChartDataModel { name="Jazan University",y=223,drilldown="Jazan University"},
-            //    new BarChartDataModel { name="King Abdulaziz University",y=63,drilldown="King Abdulaziz University"},
-            //};
-
-            List<BarChartDrillDownModel> barChartDrillDownModel = new List<BarChartDrillDownModel>()
+            var filters = UniversityService.Obj.GetAllUniversitiesFilters();
+            List<SelectListItem> selectListItem = new List<SelectListItem>();
+            foreach (var item in filters)
             {
-                new BarChartDrillDownModel{name="ALBaha University",id="ALBaha University",data=new List<Tuple<string, double>>(){ new Tuple<string, double>("Male",100), new Tuple<string, double>("Female", 100) , new Tuple<string, double>("Saudi", 100) } },
-                new BarChartDrillDownModel{name="ALBaha University",id="ALBaha University",data=new List<Tuple<string, double>>(){ new Tuple<string, double>("Male",100), new Tuple<string, double>("Female", 100) , new Tuple<string, double>("Saudi", 100) } },
-                new BarChartDrillDownModel{name="ALBaha University",id="ALBaha University",data=new List<Tuple<string, double>>(){ new Tuple<string, double>("Male",100), new Tuple<string, double>("Female", 100) , new Tuple<string, double>("Saudi", 100) } },
-                new BarChartDrillDownModel{name="ALBaha University",id="ALBaha University",data=new List<Tuple<string, double>>(){ new Tuple<string, double>("Male",100), new Tuple<string, double>("Female", 100) , new Tuple<string, double>("Saudi", 100) } },
-            };
-            var serializer = new JsonSerializer();
-            string result = JsonConvert.SerializeObject(barChartDrillDownModel);
+                selectListItem.Add(new SelectListItem() { Text = item, Value = item });
+            }
+            ViewData["filter"]=new SelectList(selectListItem,  "Text","Value");
 
-            return result;
+            if (dimention == "Gender")
+            {
+                var data = UniversityService.Obj.GetAllUniversitiesData();
+                var Female = (data.Where(x => x.Gender == "Female").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Male = (data.Where(x => x.Gender == "Male").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+
+                List<BarChartDataModel> barChartDataModel = new List<BarChartDataModel>()
+            {
+                new BarChartDataModel { name="Male",y=(Male.Select(a=> a.Sum(b=>b.CNT))).Average()},
+                new BarChartDataModel { name="Female",y=(Female.Select(a=> a.Sum(b=>b.CNT))).Average()}
+            };
+                ViewData["title"] = "Average Ratio By Gender";
+                ViewData["color"] = JsonConvert.SerializeObject((new List<string>() { "#24CBE5", "#64E572" }).ToList());
+                @ViewData["piechartDimention"] = "1";
+                string result = JsonConvert.SerializeObject(barChartDataModel);
+                return result;
+            }
+            else if (dimention == "Nationality")
+            {
+                var data = UniversityService.Obj.GetAllUniversitiesData();
+                var Saudi = (data.Where(x => x.Nationality == "Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var NonSaudi = (data.Where(x => x.Nationality == "Non Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<BarChartDataModel> barChartDataModel = new List<BarChartDataModel>()
+            {
+                new BarChartDataModel { name="Saudi",y=(Saudi.Select(a=> a.Sum(b=>b.CNT))).Average()},
+                new BarChartDataModel { name="Non Saudi",y=(NonSaudi.Select(a=> a.Sum(b=>b.CNT))).Average()}
+            };
+                ViewData["title"] = "Average Ratio By Nationality";
+                ViewData["color"] = JsonConvert.SerializeObject(new List<string>() { "#FF9655", "#FFF263" });
+                @ViewData["piechartDimention"] = "2";
+                string result = JsonConvert.SerializeObject(barChartDataModel);
+                return result;
+            }
+            else if (dimention == "Staff Type")
+            {
+                var data = UniversityService.Obj.GetAllUniversitiesData();
+                var teachingStaff = (data.Where(x => x.Staff_Type == "Teaching Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var adminandTechStaff = (data.Where(x => x.Staff_Type == "Admin and Tech Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<BarChartDataModel> barChartDataModel = new List<BarChartDataModel>()
+            {
+                new BarChartDataModel { name="TeachingST",y=(teachingStaff.Select(a=> a.Sum(b=>b.CNT))).Average()},
+                new BarChartDataModel { name="Admin&Tech",y=(adminandTechStaff.Select(a=> a.Sum(b=>b.CNT))).Average()}
+            };
+                ViewData["title"] = "Average Ratio By Staff Type";
+                ViewData["color"] = JsonConvert.SerializeObject(new List<string>() { "#ED561B", "#DDDF00" });
+                @ViewData["piechartDimention"] = "3";
+                string result = JsonConvert.SerializeObject(barChartDataModel);
+                return result;
+            }
+            else
+                throw new Exception("No Chart Found");
         }
+
+        public string PieChartSearchByUniversity(string searchCriteria, string chartDimention)
+        {
+            var filters = searchCriteria.Split(',').ToList();
+            List<SelectListItem> selectListItem = new List<SelectListItem>();
+            foreach (var item in filters)
+            {
+                selectListItem.Add(new SelectListItem() { Text = item, Value = item });
+            }
+            ViewData["filter"] = new SelectList(selectListItem, "Text", "Value");
+
+            var data = UniversityService.Obj.GetAllUniversitiesData().Where(w => filters.Contains(w.UniversityName));
+            if (chartDimention == "1")
+            {
+                var Female = (data.Where(x => x.Gender == "Female").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var Male = (data.Where(x => x.Gender == "Male").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<BarChartDataModel> barChartDataModel = new List<BarChartDataModel>()
+            {
+                new BarChartDataModel { name="Male",y=(Male.Select(a=> a.Sum(b=>b.CNT))).Average()},
+                new BarChartDataModel { name="Female",y=(Female.Select(a=> a.Sum(b=>b.CNT))).Average()}
+            };
+                ViewData["title"] = "Average Ratio By Gender";
+                ViewData["color"] = JsonConvert.SerializeObject((new List<string>() { "#24CBE5", "#64E572" }).ToList());
+                @ViewData["piechartDimention"] = "1";
+                string result = JsonConvert.SerializeObject(barChartDataModel);
+                return result;
+            }
+            else if (chartDimention == "2")
+            {
+                var Saudi = (data.Where(x => x.Nationality == "Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var NonSaudi = (data.Where(x => x.Nationality == "Non Saudi").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                List<BarChartDataModel> barChartDataModel = new List<BarChartDataModel>()
+            {
+                new BarChartDataModel { name="Saudi",y=(Saudi.Select(a=> a.Sum(b=>b.CNT))).Average()},
+                new BarChartDataModel { name="Non Saudi",y=(NonSaudi.Select(a=> a.Sum(b=>b.CNT))).Average()}
+            };
+                ViewData["title"] = "Average Ratio By Nationality";
+                ViewData["color"] = JsonConvert.SerializeObject(new List<string>() { "#FF9655", "#FFF263" });
+                @ViewData["piechartDimention"] = "2";
+                string result = JsonConvert.SerializeObject(barChartDataModel);
+                return result;
+            }
+            else if (chartDimention == "3")
+            {
+                var teachingStaff = (data.Where(x => x.Staff_Type == "Teaching Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                var adminandTechStaff = (data.Where(x => x.Staff_Type == "Admin and Tech Staff").Select(s => new { s.UniversityName, s.CNT }).GroupBy(g => g.UniversityName)).ToList();
+                
+                List<BarChartDataModel> barChartDataModel = new List<BarChartDataModel>()
+            {
+                new BarChartDataModel { name="TeachingST",y=(teachingStaff.Select(a=> a.Sum(b=>b.CNT))).Average()},
+                new BarChartDataModel { name="Admin&Tech",y=(adminandTechStaff.Select(a=> a.Sum(b=>b.CNT))).Average()}
+            };
+                ViewData["title"] = "Average Ratio By Staff Type";
+                ViewData["color"] = JsonConvert.SerializeObject(new List<string>() { "#ED561B", "#DDDF00" });
+                @ViewData["piechartDimention"] = "3";
+                string result = JsonConvert.SerializeObject(barChartDataModel);
+                return result;
+            }
+            else
+                throw new Exception("No Chart Found");
+        }
+
 
     }
 }

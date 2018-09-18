@@ -25,15 +25,16 @@
 </div>
 <div class="clearfix"></div>
 <!-- MAIN CONTENT AREA STARTS -->
-@*<a class="db_box_large fa fa-filter" style="float:right;margin-right:15px" data-toggle="modal" href="#section-settings"></a>*@
+@Html.HiddenFor(m=>m.SearchCriteria)
+@Html.Action("GetChart", new { dimention = "Gender" })
+@Html.Action("GetChart", new { dimention = "Nationality" })
+@Html.Action("GetChart", new { dimention = "Staff Type" })
+@Html.Action("GetPieChart", new { dimention = "Gender" })
+@Html.Action("GetPieChart", new { dimention = "Nationality" })
+@Html.Action("GetPieChart", new { dimention = "Staff Type" })
+@*@Html.Action("GetPieChart", new { dimention = "Staff Type" })
+    @Html.Action("GetPieChart", new { dimention = "Staff Type" })*@
 
-@Html.Partial("_LineChart", Model)
-@Html.Partial("_CombinationChart", Model.combinationModel)
-@Html.Partial("_PieChart", Model)
-@Html.Partial("_PramidChart", Model)
-@*<div class="content-body">*@
-@Html.Partial("_Chat", null)
-@*</div>*@
 <div class="modal" id="section-settings" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog animated bounceInDown">
         <div class="modal-content">
@@ -68,3 +69,6 @@
         </div>
     </div>
 </div>
+<script>
+ 
+</script>

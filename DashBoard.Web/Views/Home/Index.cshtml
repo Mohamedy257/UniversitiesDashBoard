@@ -14,9 +14,18 @@
         });
     </script>
 }
+@*<div class="loader"></div>*@
 <section class="wrapper main-wrapper row" style=''>
-    @Html.Partial("_DashboardAll",Model)
+    @Html.Partial("_DashboardAll", Model)
 </section>
+<script>
+    $(document).ready(function () {
+        $("#drpsearch").change(function () {
+            $("#SearchCriteria").val($("#drpsearch").val());
+            $("a#search").each(function (i) { $(this).trigger('click'); });
 
+        });
+    });
+</script>
 
 

@@ -11,6 +11,6 @@ namespace UniversitiesDashBoardDemo.Models
         //public double y { get; set; }
         //public bool sliced { get; set; }
         //public bool selected { get; set; }
-        public List<int> data { get; set; }
+        public List<double?> data { get; set; }
     }
 }

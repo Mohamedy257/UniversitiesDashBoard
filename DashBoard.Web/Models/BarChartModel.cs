@@ -16,7 +16,7 @@ namespace UniversitiesDashBoardDemo.Models
     public class BarChartDataModel
     {
         public string name { get; set; }
-        public int y { get; set; }
+        public double? y { get; set; }
         public string drilldown { get; set; }
     }
 
